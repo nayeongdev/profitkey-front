@@ -1,6 +1,7 @@
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { Modal } from './modal';
+import { Modal } from '@/shared/ui';
+import { overlay } from 'overlay-kit';
 
 interface CommentMenuProps {
   onEdit: () => void;
@@ -9,7 +10,6 @@ interface CommentMenuProps {
 
 export function CommentMenu({ onEdit, onDelete }: CommentMenuProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,13 +34,7 @@ export function CommentMenu({ onEdit, onDelete }: CommentMenuProps) {
   };
 
   const handleDeleteClick = () => {
-    setIsDeleteModalOpen(true);
-    setIsMenuOpen(false);
-  };
-
-  const confirmDelete = () => {
     onDelete();
-    setIsDeleteModalOpen(false);
   };
 
   return (
@@ -62,8 +56,38 @@ export function CommentMenu({ onEdit, onDelete }: CommentMenuProps) {
               </div>
             </button>
             <button
+              type="button"
               className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
-              onClick={handleDeleteClick}
+              onClick={() => {
+                overlay.open(({ isOpen, close }) => {
+                  return (
+                    <Modal open={isOpen} onClose={close}>
+                      <div className="flex flex-col items-center gap-2">
+                        <h3 className="text-base font-bold text-[#333333]">
+                          댓글을 삭제하시겠습니까?
+                        </h3>
+                        <p className="text-[8px] font-bold text-[#333]">
+                          ※ 댓글 삭제 시 복구할 수 없습니다.
+                        </p>
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={close}
+                            className="p-2 text-base font-bold text-[#333]"
+                          >
+                            취소
+                          </button>
+                          <button
+                            onClick={handleDeleteClick}
+                            className="rounded-md bg-[#FFB400] p-2 text-base font-bold text-white"
+                          >
+                            삭제하기
+                          </button>
+                        </div>
+                      </div>
+                    </Modal>
+                  );
+                });
+              }}
             >
               <div className="flex items-center justify-center gap-2 text-base text-[#333333]">
                 <Trash2 className="h-6 w-6" />
@@ -73,14 +97,6 @@ export function CommentMenu({ onEdit, onDelete }: CommentMenuProps) {
           </div>
         </div>
       )}
-
-      <Modal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={confirmDelete}
-        title="댓글 삭제"
-        message="댓글을 삭제하시겠습니까?"
-      />
     </div>
   );
 }

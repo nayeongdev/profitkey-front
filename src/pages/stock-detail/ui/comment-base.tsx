@@ -4,7 +4,6 @@ import { HeartIcon, CommentIcon } from '@/shared/ui/icon.tsx';
 import { CommentForm } from './comment-form.tsx';
 import { useState } from 'react';
 import { CommentMenu } from './comment-menu';
-import { Modal } from './modal';
 import { cn } from '@/shared/lib/utils.ts';
 import { Loader2 } from 'lucide-react';
 import { Comment } from '../api/schema';
@@ -50,7 +49,6 @@ export function CommentBase({
   // 상태 관리
   const [isReplyVisible, setIsReplyVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [content, setContent] = useState(comment.content);
 
   const postLiked = useMutation({
@@ -103,12 +101,6 @@ export function CommentBase({
   // 삭제 처리
   const handleDelete = (): void => {
     onDelete?.(comment.id);
-  };
-
-  // 삭제 확인
-  const confirmDelete = (): void => {
-    onDelete?.(comment.id);
-    setIsDeleteModalOpen(false);
   };
 
   // 수정 취소
@@ -277,14 +269,6 @@ export function CommentBase({
           {renderReplies()}
         </li>
       )}
-
-      <Modal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={confirmDelete}
-        title="댓글 삭제"
-        message="댓글을 삭제하시겠습니까?"
-      />
     </>
   );
 }
